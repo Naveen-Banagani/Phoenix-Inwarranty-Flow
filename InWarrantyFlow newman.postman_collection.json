@@ -1,0 +1,1713 @@
+{
+	"info": {
+		"_postman_id": "6e8b09e6-96a4-4467-8594-e0bc2d60734f",
+		"name": "InWarrantyFlow newman",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13695571",
+		"_collection_link": "https://www.postman.com/lively-sunset-927824/workspace/d365400a-e90c-4f4f-8a43-508f5d202b26/collection/13695571-6e8b09e6-96a4-4467-8594-e0bc2d60734f?action=share&source=collection_link&creator=13695571"
+	},
+	"item": [
+		{
+			"name": "loginApiRequest",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Inside Pre-request\")\r",
+							"// pm.variables.set(\"username\",\"naveen\")\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Inside Post-Response\")\r",
+							"\r",
+							"var responseBody = pm.response.json()\r",
+							"pm.test(\"Verify if the status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify if response time is lessthan 100ms\",function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify if messge is equal to Success\", function(){\r",
+							"    pm.expect(responseBody.message).to.be.eql(\"Success\");\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify token is not null\", function(){\r",
+							"    pm.expect(responseBody.data.token).to.be.not.null;\r",
+							"})\r",
+							"//validate JWT token 3 parts\r",
+							"pm.test(\"Validate JWT Token\",function(){\r",
+							"    let token = pm.response.json().data.token;\r",
+							"    pm.expect(token.split(\".\")).to.have.length(3);\r",
+							"})\r",
+							"\r",
+							"\r",
+							"const jsonSchema = \r",
+							"{\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"data\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"token\": {\r",
+							"          \"type\": \"string\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"token\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"data\"\r",
+							"  ]\r",
+							"}\r",
+							"pm.test(\"Verify Json Schema\", function(){\r",
+							"    pm.response.to.have.jsonSchema(jsonSchema);\r",
+							"})\r",
+							"\r",
+							"pm.collectionVariables.set(\"fdToken\",responseBody.data.token)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"iamfd\",\r\n    \"password\": \"password\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginApiRequest-Negative Tests",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var invalidUserName = \"iamfd123\";\r",
+							"var invalidPassword = \"pwd123\";\r",
+							"pm.collectionVariables.set(\"invalidUserName\",invalidUserName);\r",
+							"pm.collectionVariables.set(\"invalidPassword\",invalidPassword);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Running Negative Tests with Invalid Credentials\")\r",
+							"pm.test(\"Verify the invalid error message\", function(){\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Invalid username or password\")\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify Status Code is 401 Unauthorized\", function(){\r",
+							"    pm.response.to.have.status(401)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"{{invalidUserName}}\",\r\n    \"password\": \"{{invalidPassword}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userDetailsApiRequest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//User Details Positive Test Case\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body contains user details\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Success\");\r",
+							"    pm.expect(jsonData.data.id).to.eql(4);\r",
+							"    pm.expect(jsonData.data.first_name).to.eql(\"fd\");\r",
+							"    pm.expect(jsonData.data.last_name).to.eql(\"fd\");\r",
+							"    pm.expect(jsonData.data.login_id).to.eql(\"iamfd\");\r",
+							"    pm.expect(jsonData.data.mobile_number).to.eql(\"8899776655\");\r",
+							"    pm.expect(jsonData.data.email_id).to.eql(\"mark@gmail.com\");\r",
+							"    pm.expect(jsonData.data.password).to.eql(\"5f4dcc3b5aa765d61d8327deb882cf99\");\r",
+							"    pm.expect(jsonData.data.reset_password_date).to.eql(null);\r",
+							"    pm.expect(jsonData.data.lock_status).to.eql(0);\r",
+							"    pm.expect(jsonData.data.is_active).to.eql(1);\r",
+							"    pm.expect(jsonData.data.mst_role_id).to.eql(5);\r",
+							"    pm.expect(jsonData.data.mst_service_location_id).to.eql(1);\r",
+							"    pm.expect(jsonData.data.created_at).to.eql(\"2021-11-03T08:06:23.000Z\");\r",
+							"    pm.expect(jsonData.data.modified_at).to.eql(\"2021-11-03T08:06:23.000Z\");\r",
+							"    pm.expect(jsonData.data.role_name).to.eql(\"FrontDesk\");\r",
+							"    pm.expect(jsonData.data.service_location).to.eql(\"Service Center A\");\r",
+							"    pm.expect(jsonData.data).to.be.not.null;\r",
+							"});\r",
+							"\r",
+							"const jsonSchema = \r",
+							"{\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"data\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"id\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"first_name\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"last_name\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"login_id\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"mobile_number\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"email_id\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"password\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"reset_password_date\": {\r",
+							"          \"type\": \"null\"\r",
+							"        },\r",
+							"        \"lock_status\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"is_active\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"mst_role_id\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"mst_service_location_id\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"created_at\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"modified_at\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"role_name\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"service_location\": {\r",
+							"          \"type\": \"string\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"id\",\r",
+							"        \"first_name\",\r",
+							"        \"last_name\",\r",
+							"        \"login_id\",\r",
+							"        \"mobile_number\",\r",
+							"        \"email_id\",\r",
+							"        \"password\",\r",
+							"        \"reset_password_date\",\r",
+							"        \"lock_status\",\r",
+							"        \"is_active\",\r",
+							"        \"mst_role_id\",\r",
+							"        \"mst_service_location_id\",\r",
+							"        \"created_at\",\r",
+							"        \"modified_at\",\r",
+							"        \"role_name\",\r",
+							"        \"service_location\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"data\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response body is valid JSON Schema\", function () {\r",
+							"    pm.response.to.have.jsonSchema(jsonSchema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body contains 'id' field and 'email_id\", function () {\r",
+							"    pm.expect(pm.response.json().data.id).to.not.be.undefined;\r",
+							"    pm.expect(pm.response.json().data.email_id).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify user details properties are present or not\", function(){\r",
+							"    const user = pm.response.json().data;\r",
+							"    pm.expect(user).to.have.property('id');\r",
+							"    pm.expect(user).to.have.property('first_name');\r",
+							"    pm.expect(user).to.have.property('last_name');\r",
+							"    pm.expect(user).to.have.property('login_id');\r",
+							"    pm.expect(user).to.have.property('mobile_number');\r",
+							"    pm.expect(user).to.have.property('email_id');\r",
+							"    pm.expect(user).to.have.property('password');\r",
+							"    pm.expect(user).to.have.property('reset_password_date');\r",
+							"    pm.expect(user).to.have.property('lock_status');\r",
+							"    pm.expect(user).to.have.property('is_active');\r",
+							"    pm.expect(user).to.have.property('mst_role_id');\r",
+							"    pm.expect(user).to.have.property('mst_service_location_id');\r",
+							"    pm.expect(user).to.have.property('created_at'); \r",
+							"    pm.expect(user).to.have.property('modified_at');\r",
+							"    pm.expect(user).to.have.property('role_name');\r",
+							"    pm.expect(user).to.have.property('service_location');\r",
+							"\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userDetailsApiRequest Duplicate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Security Check for User Details Api Request\")\r",
+							"\r",
+							"pm.test(\"Verify if the response is having password property\", function(){\r",
+							"    pm.expect(pm.response.json().data).to.not.have.property(\"password\")\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "masterApiRequest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_keys = [\"mst_oem\",\"mst_model\",\"mst_action_status\",\"mst_warrenty_status\",\"mst_platform\",\"mst_product\",\"mst_role\",\"mst_service_location\",\"mst_problem\",\"map_fst_pincode\"]\r",
+							"expected_keys.forEach(function(item){\r",
+							"    pm.test(\"Check if \" + item + \" exists\", function () {\r",
+							"    var jsonData = pm.response.json().data;\r",
+							"    pm.expect(jsonData).to.have.property(item)\r",
+							"    })\r",
+							"})\r",
+							"\r",
+							"pm.test(\"verify if the key is storing a non empty array\",function(){\r",
+							"    let jsonData = pm.response.json().data\r",
+							"    expected_keys.forEach(function(item){\r",
+							"        pm.expect(Array.isArray(jsonData[item])).to.be.true\r",
+							"    })\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/master",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"master"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createJobApiRequest",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var random = Math.random()\r",
+							"var imei = Math.floor(random * 10000000000000 + 10000000000000)\r",
+							"pm.collectionVariables.set(\"imeiNumber\",imei)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json()\r",
+							"pm.collectionVariables.set(\"job_id\", responseBody.data.job_number)\r",
+							"pm.collectionVariables.set(\"job_idNum\", responseBody.data.id)\r",
+							"\r",
+							"pm.test(\"Verify Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify Response time is below 1000ms\", function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify message contains Job Created Successfully\",function(){\r",
+							"    pm.expect(responseBody.message).to.include(\"Job created successfully\")\r",
+							"})\r",
+							"expected_keys = [\"id\", \"tr_customer_id\", \"tr_customer_product_id\"]\r",
+							"\r",
+							"expected_keys.forEach(function(item){\r",
+							"    pm.test(\"Response body contain key \" + item, function () {\r",
+							"    let data = pm.response.json().data\r",
+							"    pm.expect(data).to.have.property(item)\r",
+							"    })\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify job_number starts with JOB_\", function(){\r",
+							"    pm.expect(pm.response.json().data.job_number.startsWith(\"JOB_\")).to.be.true\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"mst_service_location_id\": 0,\r\n    \"mst_platform_id\": 2,\r\n    \"mst_warrenty_status_id\": 1,\r\n    \"mst_oem_id\": 1,\r\n    \"customer\": {\r\n        \"first_name\": \"abcABC\",\r\n        \"last_name\": \"ab\",\r\n        \"mobile_number\": \"1231231231\",\r\n        \"mobile_number_alt\": \"\",\r\n        \"email_id\": \"abc@gmail.com\",\r\n        \"email_id_alt\": \"\"\r\n    },\r\n    \"customer_address\": {\r\n        \"flat_number\": \"2\",\r\n        \"apartment_name\": \"2\",\r\n        \"street_name\": \"ahha\",\r\n        \"landmark\": \"aha\",\r\n        \"area\": \"aah\",\r\n        \"pincode\": \"517502\",\r\n        \"country\": \"India\",\r\n        \"state\": \"Andhra Pradesh\"\r\n    },\r\n    \"customer_product\": {\r\n        \"dop\": \"2025-08-31T23:00:00.000Z\",\r\n        \"serial_number\": \"{{imeiNumber}}\",\r\n        \"imei1\": \"{{imeiNumber}}\",\r\n        \"imei2\": \"{{imeiNumber}}\",\r\n        \"popurl\": \"2025-08-31T23:00:00.000Z\",\r\n        \"product_id\": 1,\r\n        \"mst_model_id\": 1\r\n    },\r\n    \"problems\": [\r\n        {\r\n            \"id\": 2,\r\n            \"remark\": \"very slow\"\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/job/create",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createJobApiRequest RandomData",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var random = Math.random()\r",
+							"var imei = Math.floor(random * 10000000000000 + 10000000000000)\r",
+							"pm.collectionVariables.set(\"imeiNumber\",imei)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json()\r",
+							"pm.collectionVariables.set(\"job_id\", responseBody.data.job_number)\r",
+							"pm.collectionVariables.set(\"job_idNum\", responseBody.data.id)\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify Response time is below 1000ms\", function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify message contains Job Created Successfully\",function(){\r",
+							"    pm.expect(responseBody.message).to.include(\"Job created successfully\")\r",
+							"})\r",
+							"expected_keys = [\"id\", \"tr_customer_id\", \"tr_customer_product_id\"]\r",
+							"\r",
+							"expected_keys.forEach(function(item){\r",
+							"    pm.test(\"Response body contain key \" + item, function () {\r",
+							"    let data = pm.response.json().data\r",
+							"    pm.expect(data).to.have.property(item)\r",
+							"    })\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify job_number starts with JOB_\", function(){\r",
+							"    pm.expect(pm.response.json().data.job_number.startsWith(\"JOB_\")).to.be.true\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"mst_service_location_id\": 0,\r\n    \"mst_platform_id\": 2,\r\n    \"mst_warrenty_status_id\": 1,\r\n    \"mst_oem_id\": 1,\r\n    \"customer\": {\r\n        \"first_name\": \"{{$randomFirstName}}\",\r\n        \"last_name\": \"{{$randomLastName}}\",\r\n        \"mobile_number\": \"{{$randomPhoneNumber}}\",\r\n        \"mobile_number_alt\": \"\",\r\n        \"email_id\": \"{{$randomEmail}}\",\r\n        \"email_id_alt\": \"\"\r\n    },\r\n    \"customer_address\": {\r\n        \"flat_number\": \"2\",\r\n        \"apartment_name\": \"2\",\r\n        \"street_name\": \"ahha\",\r\n        \"landmark\": \"aha\",\r\n        \"area\": \"aah\",\r\n        \"pincode\": \"517502\",\r\n        \"country\": \"India\",\r\n        \"state\": \"Andhra Pradesh\"\r\n    },\r\n    \"customer_product\": {\r\n        \"dop\": \"2025-08-31T23:00:00.000Z\",\r\n        \"serial_number\": \"{{imeiNumber}}\",\r\n        \"imei1\": \"{{imeiNumber}}\",\r\n        \"imei2\": \"{{imeiNumber}}\",\r\n        \"popurl\": \"2025-08-31T23:00:00.000Z\",\r\n        \"product_id\": 1,\r\n        \"mst_model_id\": 1\r\n    },\r\n    \"problems\": [\r\n        {\r\n            \"id\": 2,\r\n            \"remark\": \"very slow\"\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/job/create",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countApiRequest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"console.log(\"Positive Test Cases\")\r",
+							"var created_today_count = pm.response.json().data[1].count;\r",
+							"pm.collectionVariables.set(\"created_today_count\", created_today_count);\r",
+							"console.log(created_today_count)\r",
+							"const jsonSchema = \r",
+							"{\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"data\": {\r",
+							"      \"type\": \"array\",\r",
+							"      \"items\": [\r",
+							"        {\r",
+							"          \"type\": \"object\",\r",
+							"          \"properties\": {\r",
+							"            \"label\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"key\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"count\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            }\r",
+							"          },\r",
+							"          \"required\": [\r",
+							"            \"label\",\r",
+							"            \"key\",\r",
+							"            \"count\"\r",
+							"          ]\r",
+							"        },\r",
+							"        {\r",
+							"          \"type\": \"object\",\r",
+							"          \"properties\": {\r",
+							"            \"label\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"key\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"count\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            }\r",
+							"          },\r",
+							"          \"required\": [\r",
+							"            \"label\",\r",
+							"            \"key\",\r",
+							"            \"count\"\r",
+							"          ]\r",
+							"        },\r",
+							"        {\r",
+							"          \"type\": \"object\",\r",
+							"          \"properties\": {\r",
+							"            \"label\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"key\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"count\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            }\r",
+							"          },\r",
+							"          \"required\": [\r",
+							"            \"label\",\r",
+							"            \"key\",\r",
+							"            \"count\"\r",
+							"          ]\r",
+							"        }\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"data\"\r",
+							"  ]\r",
+							"}\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is valid JSON\", function () {\r",
+							"    pm.response.to.have.jsonSchema(jsonSchema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Count value should be number\",function(){\r",
+							"    pm.expect(pm.response.json().data[0].count).to.be.a('number');\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response cotains Key, label and count\", function(){\r",
+							"    pm.expect(pm.response.json().data[0]).to.have.property('key');\r",
+							"    pm.expect(pm.response.json().data[0]).to.have.property('label');\r",
+							"    pm.expect(pm.response.json().data[0]).to.have.property('count');\r",
+							"})\r",
+							"\r",
+							"var expected_keys = [\"pending_for_delivery\", \"created_today\", \"pending_fst_assignment\"];\r",
+							"var jsonData = pm.response.json();\r",
+							"var data = jsonData.data;\r",
+							"var actual_values = data.map(function(item){\r",
+							"    return item.key\r",
+							"})\r",
+							"\r",
+							"\r",
+							"pm.test(\"verify if keys are present in response data array\",function(){\r",
+							"    pm.expect(actual_values).to.be.members(expected_keys);\r",
+							"    console.log(actual_values)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Verify if count type is number or not\", function(){\r",
+							"    let count = pm.response.json().data[0].count\r",
+							"    console.log(count)\r",
+							"    pm.expect(typeof(count)).to.be.eql(\"number\");\r",
+							"})\r",
+							"//Optimized Way\r",
+							"\r",
+							"var data = pm.response.json().data;\r",
+							"for (index = 0; index < data.length; index++) {\r",
+							"    pm.test(\"Verify the count type for \"+ data[index].label+ \"is a number or not\",function(){\r",
+							"        let count = pm.response.json().data[index].count\r",
+							"        pm.expect(typeof(count)).to.be.eql(\"number\")\r",
+							"    })\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/count",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "detailsApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"details_key\":\"created_today\"}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/details",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "searchJobApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZmlyc3RfbmFtZSI6ImZkIiwibGFzdF9uYW1lIjoiZmQiLCJsb2dpbl9pZCI6ImlhbWZkIiwibW9iaWxlX251bWJlciI6Ijg4OTk3NzY2NTUiLCJlbWFpbF9pZCI6Im1hcmtAZ21haWwuY29tIiwicGFzc3dvcmQiOiI1ZjRkY2MzYjVhYTc2NWQ2MWQ4MzI3ZGViODgyY2Y5OSIsInJlc2V0X3Bhc3N3b3JkX2RhdGUiOm51bGwsImxvY2tfc3RhdHVzIjowLCJpc19hY3RpdmUiOjEsIm1zdF9yb2xlX2lkIjo1LCJtc3Rfc2VydmljZV9sb2NhdGlvbl9pZCI6MSwiY3JlYXRlZF9hdCI6IjIwMjEtMTEtMDNUMDg6MDY6MjMuMDAwWiIsIm1vZGlmaWVkX2F0IjoiMjAyMS0xMS0wM1QwODowNjoyMy4wMDBaIiwicm9sZV9uYW1lIjoiRnJvbnREZXNrIiwic2VydmljZV9sb2NhdGlvbiI6IlNlcnZpY2UgQ2VudGVyIEEiLCJpYXQiOjE3NTY5MjQzMzl9.DhHd6zABBkUPhCnUXEVyLvBkY4Icqpi4dTQLqRiWAjo",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"searchText\": \"{{job_id}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/job/search",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "jobDetailsApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZmlyc3RfbmFtZSI6ImZkIiwibGFzdF9uYW1lIjoiZmQiLCJsb2dpbl9pZCI6ImlhbWZkIiwibW9iaWxlX251bWJlciI6Ijg4OTk3NzY2NTUiLCJlbWFpbF9pZCI6Im1hcmtAZ21haWwuY29tIiwicGFzc3dvcmQiOiI1ZjRkY2MzYjVhYTc2NWQ2MWQ4MzI3ZGViODgyY2Y5OSIsInJlc2V0X3Bhc3N3b3JkX2RhdGUiOm51bGwsImxvY2tfc3RhdHVzIjowLCJpc19hY3RpdmUiOjEsIm1zdF9yb2xlX2lkIjo1LCJtc3Rfc2VydmljZV9sb2NhdGlvbl9pZCI6MSwiY3JlYXRlZF9hdCI6IjIwMjEtMTEtMDNUMDg6MDY6MjMuMDAwWiIsIm1vZGlmaWVkX2F0IjoiMjAyMS0xMS0wM1QwODowNjoyMy4wMDBaIiwicm9sZV9uYW1lIjoiRnJvbnREZXNrIiwic2VydmljZV9sb2NhdGlvbiI6IlNlcnZpY2UgQ2VudGVyIEEiLCJpYXQiOjE3NTY5MjQzMzl9.DhHd6zABBkUPhCnUXEVyLvBkY4Icqpi4dTQLqRiWAjo"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/job/details/{{job_id}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"details",
+						"{{job_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginApiRequestForSupervisor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"var responseBody = pm.response.json()\r",
+							"\r",
+							"pm.collectionVariables.set(\"supToken\",responseBody.data.token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"iamsup\",\r\n    \"password\": \"password\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userDetailsApiRequestForSupervisor",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3RfbmFtZSI6IkpvaG4iLCJsYXN0X25hbWUiOiJDZW5hIiwibG9naW5faWQiOiJpYW1zdXAiLCJtb2JpbGVfbnVtYmVyIjoiOTk4ODc3ODg5OSIsImVtYWlsX2lkIjoiam9obkBnbWFpbC5jb20iLCJwYXNzd29yZCI6IjVmNGRjYzNiNWFhNzY1ZDYxZDgzMjdkZWI4ODJjZjk5IiwicmVzZXRfcGFzc3dvcmRfZGF0ZSI6bnVsbCwibG9ja19zdGF0dXMiOjAsImlzX2FjdGl2ZSI6MSwibXN0X3JvbGVfaWQiOjIsIm1zdF9zZXJ2aWNlX2xvY2F0aW9uX2lkIjoxLCJjcmVhdGVkX2F0IjoiMjAyMS0xMS0wM1QwODowNjoyMy4wMDBaIiwibW9kaWZpZWRfYXQiOiIyMDIxLTEyLTIwVDA3OjQyOjAwLjAwMFoiLCJyb2xlX25hbWUiOiJTdXBlcnZpc29yIiwic2VydmljZV9sb2NhdGlvbiI6IlNlcnZpY2UgQ2VudGVyIEEiLCJpYXQiOjE3NTY5MjU1NDJ9.ATowslh_l4u0Z_QlDUq-EXFlBZBSuHe7uGUkT0DAFV8",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countApiRequestForsupervisor",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{supToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/count",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pendingForAssignmentApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{supToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/job/pending",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"pending"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "engineerMapToServiceCentreApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{supToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/mapped",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"mapped"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assignJobToEngineerApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{supToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"job_id\":\"{{job_idNum}}\",\"engineer_id\":2}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/assign",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"assign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pendingForAssignmentApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{supToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/job/pending",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"pending"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginApiRequestForEngineer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json()\r",
+							"\r",
+							"pm.collectionVariables.set(\"engToken\",responseBody.data.token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"iameng\",\"password\":\"password\"}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userdetailsApiRequestForEngineer",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countApiRequestForEngineer",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/count",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "myjobsApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/myjobs",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"myjobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "myjobsApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/myjobs",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"myjobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "masterApiRequestRepair",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/master",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"master"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "repaircompleteApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"job_id\":{{job_idNum}},\"problems\":[{\"id\":3,\"remark\":\"OS Issue\"}]}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/repaircomplete",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"repaircomplete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "myjobsApiRequestRepair",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{engToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/engineer/myjobs",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"engineer",
+						"myjobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginApiRequestforQC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json()\r",
+							"pm.collectionVariables.set(\"qcToken\", responseBody.data.token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"iamqc\",\"password\":\"password\"}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userdetailsApiRequestForQC",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{qcToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countApiRequestForQC",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{qcToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/count",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "qcApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{qcToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/qc",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"qc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "qcJobStatusApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{qcToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"job_id\":{{job_idNum}}}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/qc",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"qc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "qcApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{qcToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/qc",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"qc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginApiRequestForFrontDesk",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"iamfd\",\"password\":\"password\"}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userdetailsApiRequestForFrontDesk",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/userdetails",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"userdetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countApiRequestForFrontDesk",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify that count for create job is greater than the old value\", function(){\r",
+							"    let newValue = pm.response.json().data[1].count\r",
+							"    let oldValue = pm.collectionVariables.get(\"created_today_count\")\r",
+							"    pm.expect(newValue).to.be.greaterThan(oldValue)\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/count",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pendingDeliverydetailsApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"details_key\":\"pending_for_delivery\"}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/dashboard/details",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"dashboard",
+						"details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "readyfordeliveryApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/fd/readyfordelivery",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"fd",
+						"readyfordelivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delivertocustomerApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"job_id\":{{job_idNum}}}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/fd/delivertocustomer",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"fd",
+						"delivertocustomer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "readyfordeliveryApiRequest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/fd/readyfordelivery",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"fd",
+						"readyfordelivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "jobDetailsApiRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{fdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/job/details/{{job_id}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"job",
+						"details",
+						"{{job_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "fdToken",
+			"value": ""
+		},
+		{
+			"key": "job_id",
+			"value": ""
+		},
+		{
+			"key": "imeiNumber",
+			"value": ""
+		},
+		{
+			"key": "supToken",
+			"value": ""
+		},
+		{
+			"key": "job_idNum",
+			"value": ""
+		},
+		{
+			"key": "engToken",
+			"value": ""
+		},
+		{
+			"key": "qcToken",
+			"value": ""
+		},
+		{
+			"key": "invalidUserName",
+			"value": ""
+		},
+		{
+			"key": "invalidPassword",
+			"value": ""
+		},
+		{
+			"key": "created_today_count",
+			"value": ""
+		}
+	]
+}
