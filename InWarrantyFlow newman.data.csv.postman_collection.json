@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "6e8b09e6-96a4-4467-8594-e0bc2d60734f",
-		"name": "InWarrantyFlow newman",
+		"_postman_id": "d459ee70-6c15-48a3-9509-3ccafb0b37ac",
+		"name": "InWarrantyFlow newman newman extral data.csv",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13695571",
-		"_collection_link": "https://www.postman.com/lively-sunset-927824/workspace/d365400a-e90c-4f4f-8a43-508f5d202b26/collection/13695571-6e8b09e6-96a4-4467-8594-e0bc2d60734f?action=share&source=collection_link&creator=13695571"
+		"_collection_link": "https://www.postman.com/lively-sunset-927824/sdet-with-jatin/collection/13695571-d459ee70-6c15-48a3-9509-3ccafb0b37ac?action=share&source=collection_link&creator=13695571"
 	},
 	"item": [
 		{
@@ -595,7 +595,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"mst_service_location_id\": 0,\r\n    \"mst_platform_id\": 2,\r\n    \"mst_warrenty_status_id\": 1,\r\n    \"mst_oem_id\": 1,\r\n    \"customer\": {\r\n        \"first_name\": \"{{$randomFirstName}}\",\r\n        \"last_name\": \"{{$randomLastName}}\",\r\n        \"mobile_number\": \"{{$randomPhoneNumber}}\",\r\n        \"mobile_number_alt\": \"\",\r\n        \"email_id\": \"{{$randomEmail}}\",\r\n        \"email_id_alt\": \"\"\r\n    },\r\n    \"customer_address\": {\r\n        \"flat_number\": \"2\",\r\n        \"apartment_name\": \"2\",\r\n        \"street_name\": \"ahha\",\r\n        \"landmark\": \"aha\",\r\n        \"area\": \"aah\",\r\n        \"pincode\": \"517502\",\r\n        \"country\": \"India\",\r\n        \"state\": \"Andhra Pradesh\"\r\n    },\r\n    \"customer_product\": {\r\n        \"dop\": \"2025-08-31T23:00:00.000Z\",\r\n        \"serial_number\": \"{{imeiNumber}}\",\r\n        \"imei1\": \"{{imeiNumber}}\",\r\n        \"imei2\": \"{{imeiNumber}}\",\r\n        \"popurl\": \"2025-08-31T23:00:00.000Z\",\r\n        \"product_id\": 1,\r\n        \"mst_model_id\": 1\r\n    },\r\n    \"problems\": [\r\n        {\r\n            \"id\": 2,\r\n            \"remark\": \"very slow\"\r\n        }\r\n    ]\r\n}"
+					"raw": "{\r\n    \"mst_service_location_id\": 0,\r\n    \"mst_platform_id\": 2,\r\n    \"mst_warrenty_status_id\": 1,\r\n    \"mst_oem_id\": 1,\r\n    \"customer\": {\r\n        \"first_name\": \"{{first_name}}\",\r\n        \"last_name\": \"{{last_name}}\",\r\n        \"mobile_number\": \"{{mobile_number}}\",\r\n        \"mobile_number_alt\": \"\",\r\n        \"email_id\": \"{{email_id}}\",\r\n        \"email_id_alt\": \"\"\r\n    },\r\n    \"customer_address\": {\r\n        \"flat_number\": \"2\",\r\n        \"apartment_name\": \"2\",\r\n        \"street_name\": \"ahha\",\r\n        \"landmark\": \"aha\",\r\n        \"area\": \"aah\",\r\n        \"pincode\": \"517502\",\r\n        \"country\": \"India\",\r\n        \"state\": \"Andhra Pradesh\"\r\n    },\r\n    \"customer_product\": {\r\n        \"dop\": \"2025-08-31T23:00:00.000Z\",\r\n        \"serial_number\": \"{{imeiNumber}}\",\r\n        \"imei1\": \"{{imeiNumber}}\",\r\n        \"imei2\": \"{{imeiNumber}}\",\r\n        \"popurl\": \"2025-08-31T23:00:00.000Z\",\r\n        \"product_id\": 1,\r\n        \"mst_model_id\": 1\r\n    },\r\n    \"problems\": [\r\n        {\r\n            \"id\": 2,\r\n            \"remark\": \"very slow\"\r\n        }\r\n    ]\r\n}"
 				},
 				"url": {
 					"raw": "{{BASE_URL}}/job/create",
