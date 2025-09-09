@@ -19,7 +19,7 @@ jobs:
       - name: Install Node.js and npm
         uses: actions/setup-node@v3.9.1
         with: 
-          node-version: '22'
+          node-version: '18'
 
       - name: Install newman and html reportr globally
         run: |
