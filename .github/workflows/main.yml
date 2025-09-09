@@ -23,8 +23,8 @@ jobs:
 
       - name: Install newman and html reportr globally
         run: |
-             npm install -g newman
-             npm install -g newman-reporter-htmlextra
+            npm install -g newman
+            npm install -g newman-reporter-htmlextra
 
       - name: Run Postman Collection with Newman
         run: |
