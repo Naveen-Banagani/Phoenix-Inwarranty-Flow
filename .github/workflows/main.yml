@@ -56,7 +56,7 @@ jobs:
           server_port: 465
           username: ${{ secrets.EMAIL_USERNAME}}
           password: ${{ secrets.EMAIL_PASSWORD}}
-          subjecct: Phoenix Inwaarenty flow test execution Notification
+          subject: Phoenix Inwaarenty flow test execution Notification
           to: naveenbanagani@gmail.com
           from: ${{ secrets.EMAIL_USERNAME}}
           body: |
