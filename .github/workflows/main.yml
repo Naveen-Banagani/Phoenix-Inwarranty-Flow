@@ -31,7 +31,8 @@ jobs:
             newman run 'InWarrantyFlow newman.data.csv.postman_collection.json' \
             -e QA.postman_environment.json \
             -d testdata.csv \
-            -r cli,htmlextra
+            -r cli,htmlextra \
+            --reporter-htmlextra-export ./newman/index.html
 
       - name: newman report
         if: always() #ensure that the archive executed ireespective whether the previous step had passed or not
