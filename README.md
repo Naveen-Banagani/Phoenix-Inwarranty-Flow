@@ -33,7 +33,7 @@ You can directly view the latest test report of the Postman Test at the Github P
 
 ## HTML Report ##
 The Report will be created in the newman folder
-
+![Postman Report] (https://github.com/Naveen-Banagani/Phoenix-Inwarranty-Flow/blob/static-content/newman-report.png)
 
 ## Project Structure ##
 ```
