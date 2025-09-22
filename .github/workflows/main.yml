@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron : '30 2 * * *' #8:00am IST
-    - cron : '30 13 * * *' #7:00pm IST
-    - cron : '30 6 * * 1-5' #11:30am IST from monday to friday
+  # schedule:
+  #   - cron : '30 2 * * *' #8:00am IST
+  #   - cron : '30 13 * * *' #7:00pm IST
+  #   - cron : '30 6 * * 1-5' #11:30am IST from monday to friday
 
 jobs:
   run-tests:
